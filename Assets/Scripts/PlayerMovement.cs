@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Moves the dwarf with WASD or arrow keys.
-[RequireComponent(typeof(SpriteRenderer))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Set in Inspector")]
@@ -11,13 +10,6 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 maximumPosition = new Vector2(12.5f, 6f);
 
     [HideInInspector] public Vector2 moveDirection;
-    SpriteRenderer spriteRenderer;
-
-    void Awake()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-
     void Update()
     {
         Keyboard keyboard = Keyboard.current;
@@ -42,8 +34,5 @@ public class PlayerMovement : MonoBehaviour
         pos.x = Mathf.Clamp(pos.x, minimumPosition.x, maximumPosition.x);
         pos.y = Mathf.Clamp(pos.y, minimumPosition.y, maximumPosition.y);
         transform.position = pos;
-
-        if (moveDirection.x != 0f)
-            spriteRenderer.flipX = moveDirection.x < 0f;
     }
 }
