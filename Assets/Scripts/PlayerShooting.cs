@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Aims the gun at the mouse and fires at a steady rate.
+// aim at the mouse and fire automatically
 public class PlayerShooting : MonoBehaviour
 {
     [Header("Set in Inspector")]
@@ -10,6 +10,7 @@ public class PlayerShooting : MonoBehaviour
     public SpriteRenderer gunRenderer;
     public SpriteRenderer playerRenderer;
     [Min(0.05f)] public float secondsBetweenShots = 0.3f;
+    public int damage = 1;
 
     Camera gameCamera;
     Vector3 muzzleOffset;
@@ -23,11 +24,12 @@ public class PlayerShooting : MonoBehaviour
 
     void LateUpdate()
     {
+        if (Time.timeScale == 0f) return;
         Mouse mouse = Mouse.current;
         if (mouse == null || gameCamera == null || !Application.isFocused) return;
 
         Vector2 mousePosition = mouse.position.ReadValue();
-        // Stop firing while the pointer is outside the Game view.
+        // only shoot inside the game view
         if (!gameCamera.pixelRect.Contains(mousePosition)) return;
 
         Vector3 screenPosition = new Vector3(mousePosition.x, mousePosition.y,
@@ -36,10 +38,11 @@ public class PlayerShooting : MonoBehaviour
         Vector2 direction = target - transform.position;
         if (direction.sqrMagnitude < 0.01f) return;
 
+        //convert direction to angle
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
-        // Flip the gun vertically on the left so it never looks upside down.
+        // keep the gun upright when aiming left
         bool aimingLeft = direction.x < 0f;
         gunRenderer.flipY = aimingLeft;
         playerRenderer.flipX = aimingLeft;
@@ -49,7 +52,12 @@ public class PlayerShooting : MonoBehaviour
 
         if (Time.time >= nextShotTime)
         {
-            Instantiate(bulletPrefab, muzzle.position, transform.rotation);
+            // send the bullet from the barrel toward the crosshair
+            Vector2 shotDirection = target - muzzle.position;
+            float shotAngle = Mathf.Atan2(shotDirection.y, shotDirection.x) * Mathf.Rad2Deg;
+            Bullet bullet = Instantiate(bulletPrefab, muzzle.position, Quaternion.Euler(0f, 0f, shotAngle));
+            bullet.damage = damage;
+            GameAudio.Instance?.Shoot();
             nextShotTime = Time.time + secondsBetweenShots;
         }
     }

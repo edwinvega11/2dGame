@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Moves the dwarf with WASD or arrow keys.
+// move with wasd or arrow keys
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Set in Inspector")]
@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
     [HideInInspector] public Vector2 moveDirection;
     void Update()
     {
+        if (Time.timeScale == 0f) { moveDirection = Vector2.zero; return; }
         Keyboard keyboard = Keyboard.current;
         Vector2 input = Vector2.zero;
 
@@ -23,14 +24,14 @@ public class PlayerMovement : MonoBehaviour
             if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) input.y += 1f;
         }
 
-        // Clamping the input prevents diagonal movement from being faster.
+        // keep diagonal movement at the same speed
         moveDirection = Vector2.ClampMagnitude(input, 1f);
 
         Vector3 pos = transform.position;
         pos.x += moveDirection.x * moveSpeed * Time.deltaTime;
         pos.y += moveDirection.y * moveSpeed * Time.deltaTime;
 
-        // Keep the player inside the clearing.
+        // stay inside the clearing
         pos.x = Mathf.Clamp(pos.x, minimumPosition.x, maximumPosition.x);
         pos.y = Mathf.Clamp(pos.y, minimumPosition.y, maximumPosition.y);
         transform.position = pos;

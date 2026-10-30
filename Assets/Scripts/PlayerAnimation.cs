@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Switches between the dwarf's idle and walking frames.
+// switch between idle and walking
 [RequireComponent(typeof(PlayerMovement), typeof(SpriteRenderer))]
 public class PlayerAnimation : MonoBehaviour
 {
@@ -31,7 +31,7 @@ public class PlayerAnimation : MonoBehaviour
         if (frames == null || frames.Length == 0) return;
 
         animationTime += Time.deltaTime;
-        // The remainder (%) wraps the frame number back to the start.
+        // wrap back to the first frame
         int frame = Mathf.FloorToInt(animationTime * framesPerSecond) % frames.Length;
         spriteRenderer.sprite = frames[frame];
     }
